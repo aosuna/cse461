@@ -14,8 +14,6 @@
 #source code, screenshot of executed code, results, strategy, 
 
 import random
-#import sys
-#import os
 import numpy
 
 i = 0
@@ -23,15 +21,17 @@ cylinder = 4999
 block = 512
 request = []
 
+testArry = [98,183,37,122,14,128,65,67]
+
 #print out the average head movement for each algorithm, store each run in a temp
 FSCSheadMov = []
 SSTFheadMov = []
 
+
 startHead = raw_input("Enter the start head position: ")
 startHead = int(startHead)
 
-
-#input several request for disk access
+#generates several request for disk access
 def getSchedule():
 	request.append(startHead)
 	while(len(request) < 10):
@@ -45,36 +45,37 @@ def FCFS(scheduling):
 		if( j <= len(scheduling)):
 			headMov = abs(access - (scheduling[j]))
 			FSCSheadMov.append(headMov)
-
 			j += 1
 
 #Shortest Seek Time First Algorithm
-def SSTF(scheduling):
-	minDist = []
-	leftDis = 0
-	rightDis = 0
+minDistArry = []
+def SSTF(scheduling, headPos):
+	
+	if(len(minDistArry) > 99):
+		minDistArry = []
 
-	numpy.sort(scheduling)
-	headPos = scheduling.index(startHead)
+	minDist = 0
+	if(len(scheduling) > 1):
+		minDist = abs(scheduling[0] - headPos)	
+		arrElmt = scheduling[0]
+		
+		for x in scheduling:
+			#print "in position: " + str(x)
+			if( abs(headPos - x) < minDist):
+				minDist = abs(headPos - x)
+				arrElmt = x
 
-	for x in range(len(scheduling)):
+		print arrElmt
+		print "size of array: " + str(len(scheduling))
+		minDistArry.append(minDist)
+		scheduling.remove(arrElmt)
+		SSTF(scheduling, arrElmt)
 
-		leftDis = abs(scheduling[headPos]) - scheduling[headPos-1]
-		rightDis = abs(scheduling[headPos] - scheduling[headPos + 1])
+	SSTFheadMov.append(numpy.mean(minDistArry))
 
-		#number right of headmovement in arry is smallest dist
-		if(leftDis < rightDis):
-			headPos = scheduling[headPos-1]
-			minDist.append(leftDis)
-		elif(leftDis > rightDis):
-			headPos = scheduling[headPos+1]
-			minDist.append(rightDis)
-		else()
+SSTF(testArry, startHead)
 
-
-
-
-
+''' main 
 while(i < 10):
 	request = getSchedule
 	print("request " + str(i) + " made")
@@ -85,3 +86,5 @@ while(i < 10):
 	request = []
 	headMovement = []
 	i += 1
+'''
+
