@@ -1,7 +1,7 @@
 # Write a program that implements the following disk-scheduling algorithms:
-# a. FCFS -fifo
-# b. SSTF - sortest path to next head movement
-# c. SCAN - scan to zero and then back up - given start head location
+# a.X FCFS -fifo
+# b.X SSTF - sortest path to next head movement
+# c.X SCAN - scan to zero and then back up - given start head location
 # d. C-SCAN - scan to end of disk then back down - given start head location
 # e. LOOK - 
 # f. C-LOOK - 
@@ -64,6 +64,7 @@ def SSTF(scheduling, headPos):
 				arrElmt = x
 		minDistArry.append(minDist)
 		scheduling.remove(arrElmt)
+
 	SSTFheadMov.append(numpy.mean(minDistArry))
 
 #SCAN AKA Elevator algorithm
@@ -74,18 +75,16 @@ def SCAN(scheduling, headPos):
 	numpy.sort(scheduling)
 	startPos = scheduling.index(headPos)
 	distArry.append(scheduling[0])
-
-	#for x = scheduling.index(headPos) -> iterate backwards
 	for x in xrange(len(scheduling[:startPos]) - 1):
 		dist = abs(scheduling[x] - scheduling[x+1])
 		distArry.append(dist)
-
-	startPos = startPos + 1
-	distArry.append(abs(scheduling[0]-scheduling[startPos]))
-
-	for x in xrange(len(scheduling[startPos:]) - 1):
-		dist = abs(scheduling[x] - scheduling[x+1])
-		distArry.append(dist)
+	scheduling.reverse()
+	for x in xrange(len(scheduling[:startPos]) - 1):
+		if(x == startPos):
+			distArry.append(scheduling[x-1])
+		else:
+			dist = abs(scheduling[x] - scheduling[x+1])
+			distArry.append(dist)
 
 	SCANheadMov.append(numpy.mean(distArry))
 
