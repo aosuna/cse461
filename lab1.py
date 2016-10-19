@@ -26,6 +26,7 @@ testArry = [98,183,37,122,14,128,65,67]
 #print out the average head movement for each algorithm, store each run in a temp
 FCFSheadMov = []
 SSTFheadMov = []
+SCANheadMov = []
 
 
 startHead = raw_input("Enter the start head position: ")
@@ -55,21 +56,49 @@ def SSTF(scheduling, headPos):
 	minDistArry = []
 	while(len(scheduling) > 1):
 		minDist = 0
-		if(len(scheduling) > 1):
-			minDist = abs(scheduling[0] - headPos)	
-			arrElmt = scheduling[0]
-			
-			for x in scheduling:
-				if( abs(headPos - x) < minDist):
-					minDist = abs(headPos - x)
-					arrElmt = x
-
-			minDistArry.append(minDist)
-			scheduling.remove(arrElmt)
-
+		minDist = abs(scheduling[0] - headPos)	
+		arrElmt = scheduling[0]
+		for x in scheduling:
+			if( abs(headPos - x) < minDist):
+				minDist = abs(headPos - x)
+				arrElmt = x
+		minDistArry.append(minDist)
+		scheduling.remove(arrElmt)
 	SSTFheadMov.append(numpy.mean(minDistArry))
 
-FCFS(testArry)
-SSTF(testArry, startHead)
-print FCFSheadMov
-print SSTFheadMov
+#SCAN AKA Elevator algorithm
+def SCAN(scheduling, headPos):
+	distArry = []
+	dist = 0
+	scheduling.append(headPos)
+	numpy.sort(scheduling)
+	startPos = scheduling.index(headPos)
+	distArry.append(scheduling[0])
+
+	#for x = scheduling.index(headPos) -> iterate backwards
+	for x in xrange(len(scheduling[:startPos]) - 1):
+		dist = abs(scheduling[x] - scheduling[x+1])
+		distArry.append(dist)
+
+	startPos = startPos + 1
+	distArry.append(abs(scheduling[0]-scheduling[startPos]))
+
+	for x in xrange(len(scheduling[startPos:]) - 1):
+		dist = abs(scheduling[x] - scheduling[x+1])
+		distArry.append(dist)
+
+	SCANheadMov.append(numpy.mean(distArry))
+
+SCAN(testArry, startHead)
+print SCANheadMov
+
+''' TEST FOR MAIN 
+def main():
+	FCFS(testArry)
+	SSTF(testArry, startHead)
+	print FCFSheadMov
+	print SSTFheadMov
+
+if __name__ == '__main__':
+	main()
+'''
