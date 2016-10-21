@@ -27,6 +27,7 @@ testArry = [98,183,37,122,14,128,65,67]
 FCFSheadMov = []
 SSTFheadMov = []
 SCANheadMov = []
+C_SCANheadMov = []
 
 
 startHead = raw_input("Enter the start head position: ")
@@ -42,62 +43,106 @@ def getSchedule():
 
 #First Come First Serve Algorithm 
 def FCFS(scheduling):
+	resultArry = list(scheduling)
 	minDistArry = []
 	j = 1
-	scheduling.insert(0, startHead)
-	for x in xrange(len(scheduling) - 1):
-			headMov = abs( scheduling[x] - scheduling[x+1] )
+	resultArry.insert(0, startHead)
+	for x in xrange(len(resultArry) - 1):
+			headMov = abs( resultArry[x] - resultArry[x+1] )
 			minDistArry.append(headMov)
 
-	FCFSheadMov.append(numpy.mean(minDistArry))
+	FCFSheadMov.append(sum(minDistArry))
 
 #Shortest Seek Time First Algorithm
 def SSTF(scheduling, headPos):
+	resultArry = list(scheduling)
 	minDistArry = []
-	while(len(scheduling) > 1):
+	while(len(resultArry) > 1):
 		minDist = 0
-		minDist = abs(scheduling[0] - headPos)	
-		arrElmt = scheduling[0]
-		for x in scheduling:
+		minDist = abs(resultArry[0] - headPos)	
+		arrElmt = resultArry[0]
+		for x in resultArry:
 			if( abs(headPos - x) < minDist):
 				minDist = abs(headPos - x)
 				arrElmt = x
 		minDistArry.append(minDist)
-		scheduling.remove(arrElmt)
+		resultArry.remove(arrElmt)
 
-	SSTFheadMov.append(numpy.mean(minDistArry))
+	SSTFheadMov.append(sum(minDistArry))
 
 #SCAN AKA Elevator algorithm
 def SCAN(scheduling, headPos):
+	resultArry = list(scheduling)
 	distArry = []
 	dist = 0
-	scheduling.append(headPos)
-	numpy.sort(scheduling)
-	startPos = scheduling.index(headPos)
-	distArry.append(scheduling[0])
-	for x in xrange(len(scheduling[:startPos]) - 1):
-		dist = abs(scheduling[x] - scheduling[x+1])
+	resultArry.append(headPos)
+	resultArry = sorted(resultArry)
+	startPos = resultArry.index(headPos)
+	distArry.append(resultArry[0])
+	for x in xrange(len(resultArry[:startPos]) - 1):
+		dist = abs(resultArry[x] - resultArry[x+1])
 		distArry.append(dist)
-	scheduling.reverse()
-	for x in xrange(len(scheduling[:startPos]) - 1):
+	resultArry.reverse()
+	for x in xrange(len(resultArry[:startPos]) - 1):
 		if(x == startPos):
-			distArry.append(scheduling[x-1])
+			distArry.append(resultArry[x-1])
 		else:
+			dist = abs(resultArry[x] - resultArry[x+1])
+			distArry.append(dist)
+
+	SCANheadMov.append(sum(distArry))
+
+#C-SCAN
+def C_SCAN(scheduling, headPos):
+	resultArry = list(scheduling)
+	distArry = []
+	dist = 0
+	resultArry.append(headPos)
+	resultArry = sorted(resultArry)
+	print resultArry
+	startPos = resultArry.index(headPos)
+	#if number to the left of start postion holds the sortest distance
+	if(abs(resultArry[startPos] - resultArry[startPos-1]) < abs(resultArry[startPos] - resultArry[startPos+1])):
+		for x in xrange(len(resultArry[:startPos]) -1):
+			if(x == 0):
+				dist = resultArry[0]
+				distArry.append(dist)
+			dist = abs(resultArry[x] - resultArry[x+1])
+			distArry.append(dist)
+
+		resultArry = resultArry.reverse()
+		dist = abs(cylinder - scheduling[0])
+		distArry.append(dist)
+		
+		for x in xrange(len(scheduling[:startPos]) -1): #need to iterate only upto to the number before previous head position
+			dist = abs(scheduling[x] - scheduling[x+1])
+			distArry.append(dist)
+	#if number to the right of start position hold sortest distance
+	else:
+		for x in xrange(len(scheduling[startPos:]) - 1):
+			if(x == len(scheduling) - 1):
+				dist = abs(scheduling[x] - cylinder)
+				distArry.append(dist)
+				distArry.append(cylinder) #at end of array, got back to start of disk
+			else:
+				dist = abs(scheduling[x] - scheduling[x+1])
+				distArry.append(dist)
+
+		for x in xrange(len(scheduling[:startHead]) - 1):
 			dist = abs(scheduling[x] - scheduling[x+1])
 			distArry.append(dist)
 
-	SCANheadMov.append(numpy.mean(distArry))
+	C_SCANheadMov.append(sum(distArry))
 
-SCAN(testArry, startHead)
-print SCANheadMov
-
-''' TEST FOR MAIN 
-def main():
+#Main function
+if __name__ == "__main__":
 	FCFS(testArry)
 	SSTF(testArry, startHead)
-	print FCFSheadMov
-	print SSTFheadMov
+	SCAN(testArry, startHead)
+	C_SCAN(testArry, startHead)
 
-if __name__ == '__main__':
-	main()
-'''
+	print "First come first serve ", FCFSheadMov
+	print "Sortest seek time first ", SSTFheadMov
+	print "Scan ", SCANheadMov 
+	print "C-Scan ", C_SCANheadMov
+
