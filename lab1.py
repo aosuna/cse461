@@ -2,7 +2,7 @@
 # a.X FCFS -fifo
 # b.X SSTF - sortest path to next head movement
 # c.X SCAN - scan to zero and then back up - given start head location
-# d. C-SCAN - scan to end of disk then back down - given start head location
+# d.xC-SCAN - scan to end of disk then back down - given start head location
 # e. LOOK - 
 # f. C-LOOK - 
 # Your program will service a disk with 5,000 cylinders numbered 0 to 4,999. The program will generate a random 
@@ -19,9 +19,7 @@ import numpy
 i = 0
 cylinder = 4999
 block = 512
-SIZE = 10
-
-testArry = [98,183,37,122,14,128,65,67] 
+SIZE = 100
 
 #print out the average head movement for each algorithm, store each run in a temp
 FCFSheadMov = []
@@ -60,13 +58,14 @@ def SSTF(scheduling, headPos):
 	while(len(resultArry) > 1):
 		minDist = 0
 		minDist = abs(resultArry[0] - headPos)	
-		arrElmt = resultArry[0]
+		arryElmt = resultArry[0]
 		for x in resultArry:
-			if( abs(headPos - x) < minDist):
+			if(abs(headPos - x) < minDist):
 				minDist = abs(headPos - x)
-				arrElmt = x
+				arryElmt = x
 		minDistArry.append(minDist)
-		resultArry.remove(arrElmt)
+		resultArry.remove(arryElmt)
+		headPos = arryElmt
 
 	SSTFheadMov.append(sum(minDistArry))
 
@@ -79,16 +78,28 @@ def SCAN(scheduling, headPos):
 	resultArry = sorted(resultArry)
 	startPos = resultArry.index(headPos)
 	distArry.append(resultArry[0])
-	for x in xrange(len(resultArry[:startPos]) - 1):
-		dist = abs(resultArry[x] - resultArry[x+1])
-		distArry.append(dist)
-	resultArry.reverse()
-	for x in xrange(len(resultArry[:startPos]) - 1):
-		if(x == startPos):
-			distArry.append(resultArry[x-1])
-		else:
+
+	if(resultArry[startPos] == resultArry[0]):
+		for x in xrange(len(resultArry[:])-1):
 			dist = abs(resultArry[x] - resultArry[x+1])
 			distArry.append(dist)
+	elif(resultArry[startPos] == resultArry[len(resultArry)-1]):
+		resultArry.reverse()
+		for x in xrange(len(resultArry) -1):
+			if(x == 1):
+				dist = abs(cylinder - resultArry[x])
+				distArry.append(dist)
+	else:
+		for x in xrange(len(resultArry[:startPos]) - 1):
+			dist = abs(resultArry[x] - resultArry[x+1])
+			distArry.append(dist)
+		resultArry.reverse()
+		for x in xrange(len(resultArry[:startPos]) - 1):
+			if(x == startPos):
+				distArry.append(resultArry[x-1])
+			else:
+				dist = abs(resultArry[x] - resultArry[x+1])
+				distArry.append(dist)
 
 	SCANheadMov.append(sum(distArry))
 
@@ -98,23 +109,27 @@ def C_SCAN(scheduling, headPos):
 	distArry = []
 	dist = 0
 	resultArry.append(headPos)
+	resultArry.append(0)
+	resultArry.append(cylinder)
 	resultArry = sorted(resultArry)
-	print resultArry
 	startPos = resultArry.index(headPos)
-	#if number to the left of start postion holds the sortest distance
-	if(abs(resultArry[startPos] - resultArry[startPos-1]) < abs(resultArry[startPos] - resultArry[startPos+1])):
-		for x in xrange(len(resultArry[:startPos]) -1):
-			if(x == 0):
-				dist = resultArry[0]
-				distArry.append(dist)
+	
+	#if start postion is the first in the list
+	if(resultArry[startPos] == resultArry[0]):
+		for x in xrange(len(resultArry[:])-1):
 			dist = abs(resultArry[x] - resultArry[x+1])
 			distArry.append(dist)
-
+	#if number to the left of start postion holds the sortest distance
+	elif(abs(resultArry[startPos] - resultArry[startPos-1]) < abs(resultArry[startPos] - resultArry[startPos+1])):
+		for x in xrange(len(resultArry[:startPos]) -1):
+			if(x == 0):
+				distArry.append(resultArry[0])
+			dist = abs(resultArry[x] - resultArry[x+1])
+			distArry.append(dist)
 		resultArry = resultArry.reverse()
 		dist = abs(cylinder - scheduling[0])
 		distArry.append(dist)
-		
-		for x in xrange(len(scheduling[:startPos]) -1): #need to iterate only upto to the number before previous head position
+		for x in xrange(len(scheduling[:startPos]) -2): #need to iterate only upto to the number before previous head position
 			dist = abs(scheduling[x] - scheduling[x+1])
 			distArry.append(dist)
 	#if number to the right of start position hold sortest distance
@@ -127,8 +142,7 @@ def C_SCAN(scheduling, headPos):
 			else:
 				dist = abs(scheduling[x] - scheduling[x+1])
 				distArry.append(dist)
-
-		for x in xrange(len(scheduling[:startHead]) - 1):
+		for x in xrange(len(scheduling[:startHead]) - 2):
 			dist = abs(scheduling[x] - scheduling[x+1])
 			distArry.append(dist)
 
@@ -136,13 +150,17 @@ def C_SCAN(scheduling, headPos):
 
 #Main function
 if __name__ == "__main__":
-	FCFS(testArry)
-	SSTF(testArry, startHead)
-	SCAN(testArry, startHead)
-	C_SCAN(testArry, startHead)
+	i = 1
+	while (i < 11):
+		diskSchedule = getSchedule()
+		FCFS(diskSchedule)
+		SSTF(diskSchedule, startHead)
+		SCAN(diskSchedule, startHead)
+		C_SCAN(diskSchedule, startHead)
+		i += 1
 
-	print "First come first serve ", FCFSheadMov
-	print "Sortest seek time first ", SSTFheadMov
-	print "Scan ", SCANheadMov 
-	print "C-Scan ", C_SCANheadMov
+	print "First come first serve ", numpy.mean(FCFSheadMov)
+	print "Sortest seek time first ", numpy.mean(SSTFheadMov)
+	print "Scan ", numpy.mean(SCANheadMov)
+	print "C-Scan ", numpy.mean(C_SCANheadMov)
 
