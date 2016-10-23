@@ -2,7 +2,7 @@
 # a.X FCFS -fifo
 # b.X SSTF - sortest path to next head movement
 # c.X SCAN - scan to zero and then back up - given start head location
-# d.xC-SCAN - scan to end of disk then back down - given start head location
+# d.X C-SCAN - scan to end of disk then back down - given start head location
 # e. LOOK - 
 # f. C-LOOK - 
 # Your program will service a disk with 5,000 cylinders numbered 0 to 4,999. The program will generate a random 
@@ -19,7 +19,7 @@ import numpy
 i = 0
 cylinder = 4999
 block = 512
-SIZE = 100
+SIZE = 10
 
 #print out the average head movement for each algorithm, store each run in a temp
 FCFSheadMov = []
@@ -126,10 +126,8 @@ def C_SCAN(scheduling, headPos):
 				distArry.append(resultArry[0])
 			dist = abs(resultArry[x] - resultArry[x+1])
 			distArry.append(dist)
-		resultArry = resultArry.reverse()
-		dist = abs(cylinder - scheduling[0])
-		distArry.append(dist)
-		for x in xrange(len(scheduling[:startPos]) -2): #need to iterate only upto to the number before previous head position
+
+		for x in xrange(len(scheduling[startPos+1:]) -1): #need to iterate only upto to the number before previous head position
 			dist = abs(scheduling[x] - scheduling[x+1])
 			distArry.append(dist)
 	#if number to the right of start position hold sortest distance
@@ -138,11 +136,10 @@ def C_SCAN(scheduling, headPos):
 			if(x == len(scheduling) - 1):
 				dist = abs(scheduling[x] - cylinder)
 				distArry.append(dist)
-				distArry.append(cylinder) #at end of array, got back to start of disk
 			else:
 				dist = abs(scheduling[x] - scheduling[x+1])
 				distArry.append(dist)
-		for x in xrange(len(scheduling[:startHead]) - 2):
+		for x in xrange(len(scheduling[:startPos]) - 2):
 			dist = abs(scheduling[x] - scheduling[x+1])
 			distArry.append(dist)
 
