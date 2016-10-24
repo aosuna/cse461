@@ -26,6 +26,8 @@ FCFSheadMov = []
 SSTFheadMov = []
 SCANheadMov = []
 C_SCANheadMov = []
+LOOKheadMov = []
+C_LOOKheadMov = []
 
 
 startHead = raw_input("Enter the start head position: ")
@@ -127,23 +129,60 @@ def C_SCAN(scheduling, headPos):
 			dist = abs(resultArry[x] - resultArry[x+1])
 			distArry.append(dist)
 
-		for x in xrange(len(scheduling[startPos+1:]) -1): #need to iterate only upto to the number before previous head position
-			dist = abs(scheduling[x] - scheduling[x+1])
+		for x in xrange(len(resultArry[startPos+1:]) -1): #need to iterate only upto to the number before previous head position
+			dist = abs(resultArry[x] - resultArry[x+1])
 			distArry.append(dist)
 	#if number to the right of start position hold sortest distance
 	else:
-		for x in xrange(len(scheduling[startPos:]) - 1):
-			if(x == len(scheduling) - 1):
-				dist = abs(scheduling[x] - cylinder)
+		for x in xrange(len(resultArry[startPos:]) - 1):
+			if(x == len(resultArry) - 1):
+				dist = abs(resultArry[x] - cylinder)
 				distArry.append(dist)
 			else:
-				dist = abs(scheduling[x] - scheduling[x+1])
+				dist = abs(resultArry[x] - resultArry[x+1])
 				distArry.append(dist)
-		for x in xrange(len(scheduling[:startPos]) - 2):
-			dist = abs(scheduling[x] - scheduling[x+1])
+		for x in xrange(len(resultArry[:startPos]) - 2):
+			dist = abs(resultArry[x] - resultArry[x+1])
 			distArry.append(dist)
 
 	C_SCANheadMov.append(sum(distArry))
+
+def LOOK(scheduling, headPos):
+	resultArry = list(scheduling)
+	distArry = []
+	dist = 0
+	resultArry.append(headPos)
+	resultArry = sorted(resultArry)
+	startPos = resultArry.index(headPos)
+
+	if(startPos == len(resultArry)-1):
+		for x in xrange(len(resultArry),0, -1):
+			dist = abs(resultArry[x] - resultArry[x-1])
+			distArry.append(dist)
+	else:
+		#left value is greater than right value
+		if(abs(resultArry[startPos] - resultArry[startPos+1]) < abs(resultArry[startPos] - resultArry[startPos-1])):
+			#go through right half of the array
+			for x in xrange(startPos,len(resultArry)-1):
+				dist = abs(resultArry[x] - resultArry[x+1])
+				distArry.append(dist)
+			#if the start was not at beginning go through the left side of array
+			if(startPos != 0):
+				for x in xrange(startPos-1,len(resultArry)-1):
+					dist = abs(resultArry[x] - resultArry[x+1])
+					distArry.append(dist)
+		#right value is greater than left value
+		else:
+			if(startPos != 0 ):
+				for x in xrange(0,startPos-1):
+					dist = abs(resultArry[x] - resultArry[x+1])
+					distArry.append(dist)
+
+			for x in xrange(startPos+1,len(resultArry)-1):
+				dist = abs(resultArry[x] - resultArry[x+1])
+				distArry.append(dist)
+
+	LOOKheadMov.append(sum(distArry))
 
 #Main function
 if __name__ == "__main__":
@@ -154,10 +193,12 @@ if __name__ == "__main__":
 		SSTF(diskSchedule, startHead)
 		SCAN(diskSchedule, startHead)
 		C_SCAN(diskSchedule, startHead)
+		LOOK(diskSchedule, startHead)
 		i += 1
 
 	print "First come first serve ", numpy.mean(FCFSheadMov)
 	print "Sortest seek time first ", numpy.mean(SSTFheadMov)
 	print "Scan ", numpy.mean(SCANheadMov)
 	print "C-Scan ", numpy.mean(C_SCANheadMov)
+	print "Look ", numpy.mean(LOOKheadMov)
 
