@@ -3,8 +3,8 @@
 # b.X SSTF - sortest path to next head movement
 # c.X SCAN - scan to zero and then back up - given start head location
 # d.X C-SCAN - scan to end of disk then back down - given start head location
-# e. LOOK - 
-# f. C-LOOK - 
+# e.X LOOK - 
+# f.X C-LOOK - 
 # Your program will service a disk with 5,000 cylinders numbered 0 to 4,999. The program will generate a random 
 # series of 1,000 cylinder requests and service them according to each of the algorithms listed above. The 
 # program will be passed the initial position of the disk head (as a parameter on the command line) and report 
@@ -184,6 +184,46 @@ def LOOK(scheduling, headPos):
 
 	LOOKheadMov.append(sum(distArry))
 
+def C_LOOK(scheduling, headPos):
+	resultArry = list(scheduling)
+	distArry = []
+	dist = 0
+	resultArry.append(headPos)
+	resultArry = sorted(resultArry)
+	startPos = resultArry.index(headPos)
+	resultArry.append(0)
+	resultArry.append(cylinder)
+
+	if(startPos == len(resultArry)-1):
+		for x in xrange(len(resultArry),0, -1):
+			dist = abs(resultArry[x] - resultArry[x-1])
+			distArry.append(dist)
+	else:
+		#left value is greater than right value
+		if(abs(resultArry[startPos] - resultArry[startPos+1]) < abs(resultArry[startPos] - resultArry[startPos-1])):
+			#go through right half of the array
+			for x in xrange(startPos,len(resultArry)-1):
+				dist = abs(resultArry[x] - resultArry[x+1])
+				distArry.append(dist)
+			#if the start was not at beginning go through the left side of array
+			if(startPos != 0):
+				for x in xrange(startPos-1,len(resultArry)-1):
+					dist = abs(resultArry[x] - resultArry[x+1])
+					distArry.append(dist)
+		#right value is greater than left value
+		else:
+			if(startPos != 0 ):
+				for x in xrange(0,startPos-1):
+					dist = abs(resultArry[x] - resultArry[x+1])
+					distArry.append(dist)
+
+			for x in xrange(startPos+1,len(resultArry)-1):
+				dist = abs(resultArry[x] - resultArry[x+1])
+				distArry.append(dist)
+
+	C_LOOKheadMov.append(sum(distArry))
+
+
 #Main function
 if __name__ == "__main__":
 	i = 1
@@ -194,6 +234,8 @@ if __name__ == "__main__":
 		SCAN(diskSchedule, startHead)
 		C_SCAN(diskSchedule, startHead)
 		LOOK(diskSchedule, startHead)
+		C_LOOK(diskSchedule, startHead)
+
 		i += 1
 
 	print "First come first serve ", numpy.mean(FCFSheadMov)
@@ -201,4 +243,5 @@ if __name__ == "__main__":
 	print "Scan ", numpy.mean(SCANheadMov)
 	print "C-Scan ", numpy.mean(C_SCANheadMov)
 	print "Look ", numpy.mean(LOOKheadMov)
+	print "C-Look ", numpy.mean(C_LOOKheadMov)
 
