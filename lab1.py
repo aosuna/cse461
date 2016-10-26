@@ -6,20 +6,8 @@ import random
 import numpy
 
 cylinder = 4999
-block = 512
 SIZE = 10
-
-#print out the average head movement for each algorithm, store each run in a temp
-FCFSheadMov = []
-SSTFheadMov = []
-SCANheadMov = []
-C_SCANheadMov = []
-LOOKheadMov = []
-C_LOOKheadMov = []
-
-
-startHead = raw_input("Enter the start head position: ")
-startHead = int(startHead)
+block = 512
 
 #generates several request for disk access
 def getSchedule():
@@ -29,207 +17,276 @@ def getSchedule():
 		request.append(random.randint(0,cylinder))
 	return request
 
-#First Come First Serve Algorithm 
-def FCFS(scheduling):
-	resultArry = list(scheduling)
-	minDistArry = []
-	j = 1
-	resultArry.insert(0, startHead)
-	for x in xrange(len(resultArry) - 1):
-			headMov = abs( resultArry[x] - resultArry[x+1] )
-			minDistArry.append(headMov)
+class DiskScheduling():
+	#print out the average head movement for each algorithm, store each run in a temp
 
-	FCFSheadMov.append(sum(minDistArry))
+	FCFSheadMov = []
+	SSTFheadMov = []
+	SCANheadMov = []
+	C_SCANheadMov = []
+	LOOKheadMov = []
+	C_LOOKheadMov = []
 
-#Shortest Seek Time First Algorithm
-def SSTF(scheduling, headPos):
-	resultArry = list(scheduling)
-	minDistArry = []
-	while(len(resultArry) > 1):
-		minDist = 0
-		minDist = abs(resultArry[0] - headPos)	
-		arryElmt = resultArry[0]
-		for x in resultArry:
-			if(abs(headPos - x) < minDist):
-				minDist = abs(headPos - x)
-				arryElmt = x
-		minDistArry.append(minDist)
-		resultArry.remove(arryElmt)
-		headPos = arryElmt
+	FCFS_pos = -1
+	SSTF_pos = -1
+	SCAN_pos = -1
+	CSCAN_pos = -1
+	LOOK_pos = -1
+	CLOOK_pos = -1
 
-	SSTFheadMov.append(sum(minDistArry))
+	def __init__(self,request,start):
+		self.request = request
+		self.start = start
 
-#SCAN AKA Elevator algorithm
-def SCAN(scheduling, headPos):
-	resultArry = list(scheduling)
-	distArry = []
-	dist = 0
-	resultArry.append(headPos)
-	resultArry = sorted(resultArry)
-	startPos = resultArry.index(headPos)
-	distArry.append(resultArry[0])
+	#First Come First Serve Algorithm 
+	def FCFS(self):
+		resultArry = list(self.request)
+		minDistArry = []
+		startHead = self.start
+		if (self.FCFS_pos != -1):
+			startHead = self.FCFS_pos
+		
+		resultArry.insert(0, startHead)
+		for x in xrange(len(resultArry)-1):
+			dist = abs( resultArry[x] - resultArry[x+1] )
+			minDistArry.append(dist)
+		self.FCFS_pos = resultArry[-1]
 
-	if(resultArry[startPos] == resultArry[0]):
-		for x in xrange(len(resultArry[:])-1):
-			dist = abs(resultArry[x] - resultArry[x+1])
-			distArry.append(dist)
-	elif(resultArry[startPos] == resultArry[len(resultArry)-1]):
-		resultArry.reverse()
-		for x in xrange(len(resultArry) -1):
-			if(x == 1):
-				dist = abs(cylinder - resultArry[x])
-				distArry.append(dist)
-	else:
-		for x in xrange(len(resultArry[:startPos]) - 1):
-			dist = abs(resultArry[x] - resultArry[x+1])
-			distArry.append(dist)
-		resultArry.reverse()
-		for x in xrange(len(resultArry[:startPos]) - 1):
-			if(x == startPos):
-				distArry.append(resultArry[x-1])
-			else:
+		self.FCFSheadMov.append(sum(minDistArry))
+
+	#Shortest Seek Time First Algorithm
+	def SSTF(self):
+		resultArry = list(self.request)
+		minDistArry = []
+		startHead = self.start
+		if(self.SSTF_pos != -1):
+			startHead = self.SSTF_pos
+		while(len(resultArry) > 1):
+			minDist = abs(resultArry[0] - startHead)
+			arryElmt = resultArry[0]
+			for x in resultArry:
+				if(abs(startHead - x) < minDist):
+					minDist = abs(startHead - x)
+					arryElmt = x
+			minDistArry.append(minDist)
+			resultArry.remove(arryElmt)
+			startHead = arryElmt
+		self.SSTF_pos = resultArry[-1]
+
+		self.SSTFheadMov.append(sum(minDistArry))
+
+	#SCAN AKA Elevator algorithm
+	def SCAN(self):
+		resultArry = list(self.request)
+		distArry = []
+		dist = 0
+		startHead = self.start
+		if(self.SCAN_pos != -1):
+			startHead = self.SCAN_pos
+		resultArry.append(startHead)
+		resultArry = sorted(resultArry)
+		startPos = resultArry.index(startHead)
+
+		#if the start position is the beginning
+		if(resultArry[startPos] == resultArry[0]):
+			if(resultArry[0] == 0):
+				distArry.append(abs(resultArry[0] - resultArry[-1]))
+			for x in xrange(len(resultArry)-1,1,-1):
 				dist = abs(resultArry[x] - resultArry[x+1])
 				distArry.append(dist)
+			self.SCAN_pos = resultArry[1]
 
-	SCANheadMov.append(sum(distArry))
-
-#C-SCAN
-def C_SCAN(scheduling, headPos):
-	resultArry = list(scheduling)
-	distArry = []
-	dist = 0
-	resultArry.append(headPos)
-	resultArry.append(0)
-	resultArry.append(cylinder)
-	resultArry = sorted(resultArry)
-	startPos = resultArry.index(headPos)
-	
-	#if start postion is the first in the list
-	if(resultArry[startPos] == resultArry[0]):
-		for x in xrange(len(resultArry[:])-1):
-			dist = abs(resultArry[x] - resultArry[x+1])
-			distArry.append(dist)
-	#if number to the left of start postion holds the sortest distance
-	elif(abs(resultArry[startPos] - resultArry[startPos-1]) < abs(resultArry[startPos] - resultArry[startPos+1])):
-		for x in xrange(len(resultArry[:startPos]) -1):
-			if(x == 0):
-				distArry.append(resultArry[0])
-			dist = abs(resultArry[x] - resultArry[x+1])
-			distArry.append(dist)
-
-		for x in xrange(len(resultArry[startPos+1:]) -1): #need to iterate only upto to the number before previous head position
-			dist = abs(resultArry[x] - resultArry[x+1])
-			distArry.append(dist)
-	#if number to the right of start position hold sortest distance
-	else:
-		for x in xrange(len(resultArry[startPos:]) - 1):
-			if(x == len(resultArry) - 1):
-				dist = abs(resultArry[x] - cylinder)
+		#if the start position is at the end
+		elif(resultArry[startPos] == resultArry[-1]):
+			#iterate through the array in reverse
+			for x in xrange(len(resultArry)-1,0,-1):
+				dist = abs(resultArry[x] - resultArry[x-1])
 				distArry.append(dist)
-			else:
-				dist = abs(resultArry[x] - resultArry[x+1])
-				distArry.append(dist)
-		for x in xrange(len(resultArry[:startPos]) - 2):
-			dist = abs(resultArry[x] - resultArry[x+1])
-			distArry.append(dist)
-
-	C_SCANheadMov.append(sum(distArry))
-
-def LOOK(scheduling, headPos):
-	resultArry = list(scheduling)
-	distArry = []
-	dist = 0
-	resultArry.append(headPos)
-	resultArry = sorted(resultArry)
-	startPos = resultArry.index(headPos)
-
-	if(startPos == len(resultArry)-1):
-		for x in xrange(len(resultArry),0, -1):
-			dist = abs(resultArry[x] - resultArry[x-1])
-			distArry.append(dist)
-	else:
-		#left value is greater than right value
-		if(abs(resultArry[startPos] - resultArry[startPos+1]) < abs(resultArry[startPos] - resultArry[startPos-1])):
-			#go through right half of the array
+			self.SCAN_pos = resultArry[0]
+		#start position is not at the end or at the beginning
+		else:
+			#go through the right side first
 			for x in xrange(startPos,len(resultArry)-1):
 				dist = abs(resultArry[x] - resultArry[x+1])
 				distArry.append(dist)
-			#if the start was not at beginning go through the left side of array
-			if(startPos != 0):
-				for x in xrange(startPos-1,len(resultArry)-1):
-					dist = abs(resultArry[x] - resultArry[x+1])
+			#go through the left side second
+			for x in xrange(startPos-1,0,-1):
+					dist = abs(resultArry[x] - resultArry[x-1])
 					distArry.append(dist)
-		#right value is greater than left value
-		else:
-			if(startPos != 0 ):
-				for x in xrange(0,startPos-1):
-					dist = abs(resultArry[x] - resultArry[x+1])
-					distArry.append(dist)
+			self.SCAN_pos = resultArry[0]
 
-			for x in xrange(startPos+1,len(resultArry)-1):
+		self.SCANheadMov.append(sum(distArry))
+
+	#C-SCAN
+	def C_SCAN(self):
+		resultArry = list(self.request)
+		distArry = []
+		dist = 0
+		startHead = self.start
+		if(self.CSCAN_pos != -1):
+			startHead = self.CSCAN_pos
+		resultArry.append(startHead)
+		resultArry = sorted(resultArry)
+		startPos = resultArry.index(startHead)
+		
+		#if start postion is the first in the list
+		if(resultArry[startPos] == resultArry[0]):
+			for x in xrange(len(resultArry)-1):
 				dist = abs(resultArry[x] - resultArry[x+1])
 				distArry.append(dist)
+			self.CSCAN_pos = resultArry[-1]
 
-	LOOKheadMov.append(sum(distArry))
-
-def C_LOOK(scheduling, headPos):
-	resultArry = list(scheduling)
-	distArry = []
-	dist = 0
-	resultArry.append(headPos)
-	resultArry = sorted(resultArry)
-	startPos = resultArry.index(headPos)
-	resultArry.append(0)
-	resultArry.append(cylinder)
-
-	if(startPos == len(resultArry)-1):
-		for x in xrange(len(resultArry),0, -1):
-			dist = abs(resultArry[x] - resultArry[x-1])
-			distArry.append(dist)
-	else:
-		#left value is greater than right value
-		if(abs(resultArry[startPos] - resultArry[startPos+1]) < abs(resultArry[startPos] - resultArry[startPos-1])):
-			#go through right half of the array
+		#if number to the left of start postion holds the sortest distance
+		elif(abs(resultArry[startPos] - resultArry[startPos-1]) < abs(resultArry[startPos] - resultArry[startPos+1])):
+			for x in xrange(startPos,0,-1):
+				if(x == 0):
+					distArry.append(resultArry[0]) #distance from zero first element
+				dist = abs(resultArry[x] - resultArry[x-1])
+				distArry.append(dist)
+			for x in xrange(startPos+1,len(resultArry)-1): #from start +1 to end
+				if(x == startPos+1):
+					distArry.append(resultArry[x]) #distance from zero to rest of array
+				dist = abs(resultArry[x] - resultArry[x+1])
+				distArry.append(dist)
+			self.CSCAN_pos = resultArry[-1]
+		#if number to the right of start position hold sortest distance
+		else:
 			for x in xrange(startPos,len(resultArry)-1):
+				if(x == len(resultArry)-1): #at end of list to end of disk
+					dist = abs(resultArry[x] - cylinder) 
+					distArry.append(dist)
 				dist = abs(resultArry[x] - resultArry[x+1])
 				distArry.append(dist)
-			#if the start was not at beginning go through the left side of array
-			if(startPos != 0):
-				for x in xrange(startPos-1,len(resultArry)-1):
-					dist = abs(resultArry[x] - resultArry[x+1])
+			for x in xrange(startPos-1,0,-1):
+				if(x == startPos-1):
+					dist = abs(cylinder - resultArry[x])
 					distArry.append(dist)
-		#right value is greater than left value
+				dist = abs(resultArry[x] - resultArry[x-1])
+				distArry.append(dist)
+			self.CSCAN_pos = resultArry[0]
+		self.C_SCANheadMov.append(sum(distArry))
+
+	def LOOK(self):
+		resultArry = list(self.request)
+		distArry = []
+		dist = 0
+		startHead = self.start
+		if(self.LOOK_pos != -1):
+			startHead = self.LOOK_pos
+		resultArry.append(startHead)
+		resultArry = sorted(resultArry)
+		startPos = resultArry.index(startHead)
+
+		if(resultArry[startPos] == resultArry[-1]):
+			for x in xrange(len(resultArry),0, -1):
+				dist = abs(resultArry[x] - resultArry[x-1])
+				distArry.append(dist)
+			self.LOOK_pos = resultArry[0]
 		else:
-			if(startPos != 0 ):
-				for x in xrange(0,startPos-1):
+			#left value is greater than right value
+			if(abs(resultArry[startPos] - resultArry[startPos+1]) < abs(resultArry[startPos] - resultArry[startPos-1])):
+				#go through right half of the array
+				for x in xrange(startPos,len(resultArry)-1):
 					dist = abs(resultArry[x] - resultArry[x+1])
 					distArry.append(dist)
+				#if the start was not at beginning go through the left side of array
+				for x in xrange(startPos-1,0,-1):
+					if(x == startPos-1): #take distance from the end of list to the one previous to the OG start position
+						dist = abs(resultArry[-1] - resultArry[x])
+						distArry.append(dist)
+					dist = abs(resultArry[x] - resultArry[x-1])
+					distArry.append(dist)
+				self.LOOK_pos = resultArry[0]
+			#right value is greater than left value
+			else:
+				for x in xrange(startPos,0,-1):
+					dist = abs(resultArry[x] - resultArry[x-1])
+					distArry.append(dist)
 
-			for x in xrange(startPos+1,len(resultArry)-1):
-				dist = abs(resultArry[x] - resultArry[x+1])
+				for x in xrange(startPos+1,len(resultArry)-1):
+					if(x == startPos+1):
+						dist = abs(resultArry[x] - resultArry[0])
+					dist = abs(resultArry[x] - resultArry[x+1])
+					distArry.append(dist)
+				self.LOOK_pos = resultArry[-1]
+
+		self.LOOKheadMov.append(sum(distArry))
+
+	def C_LOOK(self):
+		resultArry = list(self.request)
+		distArry = []
+		dist = 0
+		startHead = self.start
+		if(self.CLOOK_pos != -1):
+			startHead = self.CLOOK_pos
+		resultArry.append(startHead)
+		resultArry = sorted(resultArry)
+		startPos = resultArry.index(startHead)
+
+		if(startPos == len(resultArry)-1):
+			for x in xrange(len(resultArry)-1,0, -1):
+				dist = abs(resultArry[x] - resultArry[x-1])
 				distArry.append(dist)
+			self.CLOOK_pos = resultArry[0]
+		elif(resultArry[startPos] == resultArry[0]):
+			for x in xrange(0,len(resultArry)-1):
+				dist = abs(resultArry[x] - resultArry[x-1])
+				distArry.append(dist)
+			self.CLOOK_pos = resultArry[-1]
+		else:
+			#left value is greater than right value
+			if(abs(resultArry[startPos] - resultArry[startPos+1]) < abs(resultArry[startPos] - resultArry[startPos-1])):
+				#go through right half of the array
+				for x in xrange(startPos,len(resultArry)-1):
+					dist = abs(resultArry[x] - resultArry[x+1])
+					distArry.append(dist)
+				#if the start was not at beginning go through the left side of array
+				for x in xrange(startPos-1,0,-1):
+					if(x == startPos -1):
+						dist = abs(resultArry[x] - resultArry[-1])
+						distArry.append(dist)
+					dist = abs(resultArry[x] - resultArry[x-1])
+					distArry.append(dist)
+				self.CLOOK_pos = resultArry[0]
+			#right value is greater than left value
+			else:
+				for x in xrange(startPos, 0, -1):
+					dist = abs(resultArry[x] - resultArry[x-1])
+					distArry.append(dist)
+				for x in xrange(startPos+1,len(resultArry)-1):
+					if(x == startPos+1):
+						dist = abs(resultArry[x] - resultArry[0])
+						distArry.append(dist)
+					dist = abs(resultArry[x] - resultArry[x+1])
+					distArry.append(dist)
+				self.CLOOK_pos = resultArry[-1]
 
-	C_LOOKheadMov.append(sum(distArry))
-
+		self.C_LOOKheadMov.append(sum(distArry))
 
 #Main function
 if __name__ == "__main__":
-	i = 1
-	while (i < 11):
-		diskSchedule = getSchedule()
-		FCFS(diskSchedule)
-		SSTF(diskSchedule, startHead)
-		SCAN(diskSchedule, startHead)
-		C_SCAN(diskSchedule, startHead)
-		LOOK(diskSchedule, startHead)
-		C_LOOK(diskSchedule, startHead)
+	startHead = int(input("Enter the start head position a value from 0 - 4999: "))
+	if(startHead < 4999 and startHead > 0):
+		i = 1
+		while (i < 11):
+			request = getSchedule()
+			disk = DiskScheduling(request, startHead)
 
-		i += 1
+			disk.FCFS()
+			disk.SSTF()
+			disk.SCAN()
+			disk.C_SCAN()
+			disk.LOOK()
+			disk.C_LOOK()
 
-	print "First come first serve ", numpy.mean(FCFSheadMov)
-	print "Sortest seek time first ", numpy.mean(SSTFheadMov)
-	print "Scan ", numpy.mean(SCANheadMov)
-	print "C-Scan ", numpy.mean(C_SCANheadMov)
-	print "Look ", numpy.mean(LOOKheadMov)
-	print "C-Look ", numpy.mean(C_LOOKheadMov)
+			i += 1 #end while loop
 
+		print "FCFS: ", numpy.mean(disk.FCFSheadMov)
+		print "SSTF: ", numpy.mean(disk.SSTFheadMov)
+		print "Scan: ", numpy.mean(disk.SCANheadMov)
+		print "C-Scan: ", numpy.mean(disk.C_SCANheadMov)
+		print "Look: ", numpy.mean(disk.LOOKheadMov)
+		print "C-Look: ", numpy.mean(disk.C_LOOKheadMov)
+
+	else:
+		print "Invalid input \n"
