@@ -265,28 +265,49 @@ class DiskScheduling():
 
 #Main function
 if __name__ == "__main__":
+	fcfsSTD = []
+	sstfSTD = []
+	scanSTD = []
+	cscanSTD = []
+	lookSTD = []
+	clookSTD = []
 	startHead = int(input("Enter the start head position a value from 0 - 4999: "))
 	if(startHead < 4999 and startHead > 0):
-		i = 1
-		while (i < 11):
-			request = getSchedule()
-			disk = DiskScheduling(request, startHead)
+		for j in xrange(5):
+			for i in xrange(10):
+				request = getSchedule()
+				disk = DiskScheduling(request, startHead)
 
-			disk.FCFS()
-			disk.SSTF()
-			disk.SCAN()
-			disk.C_SCAN()
-			disk.LOOK()
-			disk.C_LOOK()
+				disk.FCFS()
+				disk.SSTF()
+				disk.SCAN()
+				disk.C_SCAN()
+				disk.LOOK()
+				disk.C_LOOK()
 
-			i += 1 #end while loop
+				i += 1 #end while loop
+			print "List ", j
+			print "FCFS: ", numpy.mean(disk.FCFSheadMov)
+			print "SSTF: ", numpy.mean(disk.SSTFheadMov)
+			print "Scan: ", numpy.mean(disk.SCANheadMov)
+			print "C-Scan: ", numpy.mean(disk.C_SCANheadMov)
+			print "Look: ", numpy.mean(disk.LOOKheadMov)
+			print "C-Look: ", numpy.mean(disk.C_LOOKheadMov)
+			print "\n"
 
-		print "FCFS: ", numpy.mean(disk.FCFSheadMov)
-		print "SSTF: ", numpy.mean(disk.SSTFheadMov)
-		print "Scan: ", numpy.mean(disk.SCANheadMov)
-		print "C-Scan: ", numpy.mean(disk.C_SCANheadMov)
-		print "Look: ", numpy.mean(disk.LOOKheadMov)
-		print "C-Look: ", numpy.mean(disk.C_LOOKheadMov)
 
+			fcfsSTD.append(numpy.mean(disk.FCFSheadMov))
+			sstfSTD.append(numpy.mean(disk.SSTFheadMov))
+			scanSTD.append(numpy.mean(disk.SSTFheadMov))
+			cscanSTD.append(numpy.mean(disk.C_SCANheadMov))
+			lookSTD.append(numpy.mean(disk.LOOKheadMov))
+			clookSTD.append(numpy.mean(disk.C_LOOKheadMov))
+
+		print "FCFS Standard Deviation: ", numpy.std(fcfsSTD)
+		print "SSTF Standard Deviation: ", numpy.std(sstfSTD)
+		print "SCAN Standard Deviation: ", numpy.std(scanSTD)
+		print "C-SCAN Standard Deviation: ", numpy.std(cscanSTD)
+		print "LOOK Standard Deviation: ", numpy.std(lookSTD)
+		print "C-LOOK Standard Deviation: ", numpy.std(clookSTD)
 	else:
 		print "Invalid input \n"
