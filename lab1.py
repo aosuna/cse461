@@ -92,7 +92,7 @@ class DiskScheduling():
 			if(resultArry[0] == 0):
 				distArry.append(abs(resultArry[0] - resultArry[-1]))
 			for x in xrange(len(resultArry)-1,1,-1):
-				dist = abs(resultArry[x] - resultArry[x+1])
+				dist = abs(resultArry[x] - resultArry[x-1])
 				distArry.append(dist)
 			self.SCAN_pos = resultArry[1]
 
