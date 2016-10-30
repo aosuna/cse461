@@ -26,7 +26,7 @@ Source Code, Screenshot of Executed Code, Results and Strategy used to approach 
 
 You should be able to change all these parameters to define a different disk
 
-'''
+```
 cylinders = 4096 
 block_size = 512
 blocks_per_track = 64  // (64 blocks per track on 4 platters with 8 heads, same as 8 tracks)
@@ -44,15 +44,14 @@ rotation_speed = 7200 rpm // average rot_latency = 4.2 ms = 4.2*e^-3 sec ~ 1/2 r
 // maximum bandwidth is :
 // bytes_per_cylinder/(time-of-rotation-in-sec): in bytes/second
 
-'''
-
 page_size =  // you decide, page is usually 4K-16K
 
+```
 pages are numbered MAX-1, where MAX is number_blocks/blocks_per_page 
 
-Assume a first-come, first-served strategy
+Assume a first-come, first-served strategy:
 
-A) Given: list of 100 pages, randomly generated
+ * A) Given: list of 100 pages, randomly generated
 	calculate - time to read all requests, 
 	effective bandwidth (total bytes read)/(time to read requests)
 
@@ -61,9 +60,11 @@ note: read first page = seek+rot_latency+bytes/max_bandwidth
 	time to read next page : assume you always have rotational latency, but
 	add seek time only if have to change cylinders.
 	  
-B) Consider multi-page requests : i.e. if a program requests N consecutive pages,
+ * B) Consider multi-page requests : i.e. if a program requests N consecutive pages,
 rot. latency can be ignored unless request is on more than one cylinder. If it does, switching cylinders incurs seek and rotation.
 
 Do multipage requests affect effective bandwidth?
+
+---
     
 
