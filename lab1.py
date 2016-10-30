@@ -6,7 +6,7 @@ import random
 import numpy
 
 cylinder = 4999
-SIZE = 10
+SIZE = 100
 block = 512
 
 #generates several request for disk access
@@ -285,23 +285,22 @@ if __name__ == "__main__":
 				disk.LOOK()
 				disk.C_LOOK()
 
-				i += 1 #end while loop
 			print "List ", j
-			print "FCFS: ", numpy.mean(disk.FCFSheadMov)
-			print "SSTF: ", numpy.mean(disk.SSTFheadMov)
-			print "Scan: ", numpy.mean(disk.SCANheadMov)
-			print "C-Scan: ", numpy.mean(disk.C_SCANheadMov)
-			print "Look: ", numpy.mean(disk.LOOKheadMov)
-			print "C-Look: ", numpy.mean(disk.C_LOOKheadMov)
+			print "FCFS: ", (sum(disk.FCFSheadMov) / 1000)
+			print "SSTF: ", (sum(disk.SSTFheadMov) / 1000)
+			print "Scan: ", (sum(disk.SCANheadMov) / 1000)
+			print "C-Scan: ", (sum(disk.C_SCANheadMov) / 1000)
+			print "Look: ", (sum(disk.LOOKheadMov) / 1000)
+			print "C-Look: ", (sum(disk.C_LOOKheadMov) / 1000)
 			print "\n"
 
 
-			fcfsSTD.append(numpy.mean(disk.FCFSheadMov))
-			sstfSTD.append(numpy.mean(disk.SSTFheadMov))
-			scanSTD.append(numpy.mean(disk.SSTFheadMov))
-			cscanSTD.append(numpy.mean(disk.C_SCANheadMov))
-			lookSTD.append(numpy.mean(disk.LOOKheadMov))
-			clookSTD.append(numpy.mean(disk.C_LOOKheadMov))
+			fcfsSTD.append(sum(disk.FCFSheadMov) / 1000)
+			sstfSTD.append(sum(disk.SSTFheadMov) / 1000)
+			scanSTD.append(sum(disk.SCANheadMov) / 1000)
+			cscanSTD.append(sum(disk.C_SCANheadMov) / 1000)
+			lookSTD.append(sum(disk.LOOKheadMov) / 1000)
+			clookSTD.append(sum(disk.C_LOOKheadMov) / 1000)
 
 		print "FCFS Standard Deviation: ", numpy.std(fcfsSTD)
 		print "SSTF Standard Deviation: ", numpy.std(sstfSTD)
