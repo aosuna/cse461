@@ -67,11 +67,11 @@ Do multipage requests affect effective bandwidth?
 
 ---
 
-NOTE
-Cylinder - The set of tracks that are at one arm position makes up a cylinder.
-Seek Time - the time necessary to move the disk arm to the desired cylinder.
-Rotational Latency - the time necessary for the desired sector to rotate to the disk head.
-Mapping - The mapping proceeds in order through that track, then through the rest of the tracks in that cylinder, and then through the rest of the cylinders from outermost to innermost
+NOTE:
+ * Cylinder - The set of tracks that are at one arm position makes up a cylinder.
+ * Seek Time - the time necessary to move the disk arm to the desired cylinder.
+ * Rotational Latency - the time necessary for the desired sector to rotate to the disk head.
+ * Mapping - The mapping proceeds in order through that track, then through the rest of the tracks in that cylinder, and then through the rest of the cylinders from outermost to innermost
 
 ---
 
