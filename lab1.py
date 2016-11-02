@@ -1,12 +1,13 @@
 #Adrian Osuna
 #CSE 461 - Dr. Gomez
 #Lab 1
+# -*- coding: utf-8 -*-
 
 import random
 import numpy
 
 cylinder = 4999
-SIZE = 100
+SIZE = 10
 block = 512
 
 #generates several request for disk access
@@ -26,7 +27,7 @@ class DiskScheduling():
 	C_SCANheadMov = []
 	LOOKheadMov = []
 	C_LOOKheadMov = []
-
+	
 	FCFS_pos = -1
 	SSTF_pos = -1
 	SCAN_pos = -1
@@ -37,7 +38,21 @@ class DiskScheduling():
 	def __init__(self,request,start):
 		self.request = request
 		self.start = start
-
+		
+	def ClearAll(self):
+		FCFSheadMov = []
+		SSTFheadMov = []
+		SCANheadMov = []
+		C_SCANheadMov = []
+		LOOKheadMov = []
+		C_LOOKheadMov = []
+		
+		FCFS_pos = -1
+		SSTF_pos = -1
+		SCAN_pos = -1
+		CSCAN_pos = -1
+		LOOK_pos = -1
+		CLOOK_pos = -1
 	#First Come First Serve Algorithm 
 	def FCFS(self):
 		resultArry = list(self.request)
@@ -91,7 +106,7 @@ class DiskScheduling():
 		if(resultArry[startPos] == resultArry[0]):
 			if(resultArry[0] == 0):
 				distArry.append(abs(resultArry[0] - resultArry[-1]))
-			for x in xrange(len(resultArry)-1,1,-1):
+			for x in xrange(len(resultArry)-1,0,-1):
 				dist = abs(resultArry[x] - resultArry[x-1])
 				distArry.append(dist)
 			self.SCAN_pos = resultArry[1]
@@ -111,8 +126,8 @@ class DiskScheduling():
 				distArry.append(dist)
 			#go through the left side second
 			for x in xrange(startPos-1,0,-1):
-					dist = abs(resultArry[x] - resultArry[x-1])
-					distArry.append(dist)
+				dist = abs(resultArry[x] - resultArry[x-1])
+				distArry.append(dist)
 			self.SCAN_pos = resultArry[0]
 
 		self.SCANheadMov.append(sum(distArry))
@@ -277,7 +292,7 @@ if __name__ == "__main__":
 			for i in xrange(10):
 				request = getSchedule()
 				disk = DiskScheduling(request, startHead)
-
+				
 				disk.FCFS()
 				disk.SSTF()
 				disk.SCAN()
@@ -286,21 +301,23 @@ if __name__ == "__main__":
 				disk.C_LOOK()
 
 			print "List ", j
-			print "FCFS: ", (sum(disk.FCFSheadMov) / 1000)
-			print "SSTF: ", (sum(disk.SSTFheadMov) / 1000)
-			print "Scan: ", (sum(disk.SCANheadMov) / 1000)
-			print "C-Scan: ", (sum(disk.C_SCANheadMov) / 1000)
-			print "Look: ", (sum(disk.LOOKheadMov) / 1000)
-			print "C-Look: ", (sum(disk.C_LOOKheadMov) / 1000)
+			print "FCFS: ", (numpy.mean(disk.FCFSheadMov))
+			print "SSTF: ", (numpy.mean(disk.SSTFheadMov))
+			print "Scan: ", (numpy.mean(disk.SCANheadMov))
+			print "C-Scan: ", (numpy.mean(disk.C_SCANheadMov))
+			print "Look: ", (numpy.mean(disk.LOOKheadMov))
+			print "C-Look: ", (numpy.mean(disk.C_LOOKheadMov))
 			print "\n"
 
+			fcfsSTD.append(numpy.mean(disk.FCFSheadMov))
+			sstfSTD.append(numpy.mean(disk.SSTFheadMov))
+			scanSTD.append(numpy.mean(disk.SCANheadMov))
+			cscanSTD.append(numpy.mean(disk.C_SCANheadMov))
+			lookSTD.append(numpy.mean(disk.LOOKheadMov))
+			clookSTD.append(numpy.mean(disk.C_LOOKheadMov))
 
-			fcfsSTD.append(sum(disk.FCFSheadMov) / 1000)
-			sstfSTD.append(sum(disk.SSTFheadMov) / 1000)
-			scanSTD.append(sum(disk.SCANheadMov) / 1000)
-			cscanSTD.append(sum(disk.C_SCANheadMov) / 1000)
-			lookSTD.append(sum(disk.LOOKheadMov) / 1000)
-			clookSTD.append(sum(disk.C_LOOKheadMov) / 1000)
+			disk.ClearAll()
+
 
 		print "FCFS Standard Deviation: ", numpy.std(fcfsSTD)
 		print "SSTF Standard Deviation: ", numpy.std(sstfSTD)
