@@ -21,13 +21,6 @@ def getSchedule():
 class DiskScheduling():
 	#print out the average head movement for each algorithm, store each run in a temp
 
-	FCFSheadMov = []
-	SSTFheadMov = []
-	SCANheadMov = []
-	C_SCANheadMov = []
-	LOOKheadMov = []
-	C_LOOKheadMov = []
-	
 	FCFS_pos = -1
 	SSTF_pos = -1
 	SCAN_pos = -1
@@ -35,29 +28,37 @@ class DiskScheduling():
 	LOOK_pos = -1
 	CLOOK_pos = -1
 
-	def __init__(self,request,start):
+	FCFSheadMov = []
+	SSTFheadMov = []
+	SCANheadMov = []
+	C_SCANheadMov = []
+	LOOKheadMov = []
+	C_LOOKheadMov = []
+
+	'''def __init__(self,request,start):
 		self.request = request
-		self.start = start
+		self.start = start '''
 		
 	def ClearAll(self):
-		FCFSheadMov = []
-		SSTFheadMov = []
-		SCANheadMov = []
-		C_SCANheadMov = []
-		LOOKheadMov = []
-		C_LOOKheadMov = []
+		self.FCFSheadMov = []
+		self.SSTFheadMov = []
+		self.SCANheadMov = []
+		self.C_SCANheadMov = []
+		self.LOOKheadMov = []
+		self.C_LOOKheadMov = []
 		
-		FCFS_pos = -1
-		SSTF_pos = -1
-		SCAN_pos = -1
-		CSCAN_pos = -1
-		LOOK_pos = -1
-		CLOOK_pos = -1
+		self.FCFS_pos = -1
+		self.SSTF_pos = -1
+		self.SCAN_pos = -1
+		self.CSCAN_pos = -1
+		self.LOOK_pos = -1
+		self.CLOOK_pos = -1
+
 	#First Come First Serve Algorithm 
-	def FCFS(self):
-		resultArry = list(self.request)
+	def FCFS(self,request,start):
+		resultArry = list(request)
 		minDistArry = []
-		startHead = self.start
+		startHead = start
 		if (self.FCFS_pos != -1):
 			startHead = self.FCFS_pos
 		
@@ -70,10 +71,10 @@ class DiskScheduling():
 		self.FCFSheadMov.append(sum(minDistArry))
 
 	#Shortest Seek Time First Algorithm
-	def SSTF(self):
-		resultArry = list(self.request)
+	def SSTF(self,request,start):
+		resultArry = list(request)
 		minDistArry = []
-		startHead = self.start
+		startHead = start
 		if(self.SSTF_pos != -1):
 			startHead = self.SSTF_pos
 		while(len(resultArry) > 1):
@@ -91,11 +92,11 @@ class DiskScheduling():
 		self.SSTFheadMov.append(sum(minDistArry))
 
 	#SCAN AKA Elevator algorithm
-	def SCAN(self):
-		resultArry = list(self.request)
+	def SCAN(self,request,start):
+		resultArry = list(request)
 		distArry = []
 		dist = 0
-		startHead = self.start
+		startHead = start
 		if(self.SCAN_pos != -1):
 			startHead = self.SCAN_pos
 		resultArry.append(startHead)
@@ -133,11 +134,11 @@ class DiskScheduling():
 		self.SCANheadMov.append(sum(distArry))
 
 	#C-SCAN
-	def C_SCAN(self):
-		resultArry = list(self.request)
+	def C_SCAN(self,request,start):
+		resultArry = list(request)
 		distArry = []
 		dist = 0
-		startHead = self.start
+		startHead = start
 		if(self.CSCAN_pos != -1):
 			startHead = self.CSCAN_pos
 		resultArry.append(startHead)
@@ -150,6 +151,12 @@ class DiskScheduling():
 				dist = abs(resultArry[x] - resultArry[x+1])
 				distArry.append(dist)
 			self.CSCAN_pos = resultArry[-1]
+
+		elif(resultArry[startPos] == resultArry[-1]):
+			for x in xrange(len(resultArry)-1, 1, -1):
+				dist = abs(resultArry[x] - resultArry[x-1])
+				distArry.append(dist)
+			self.CSCAN_pos = resultArry[0]
 
 		#if number to the left of start postion holds the sortest distance
 		elif(abs(resultArry[startPos] - resultArry[startPos-1]) < abs(resultArry[startPos] - resultArry[startPos+1])):
@@ -181,11 +188,11 @@ class DiskScheduling():
 			self.CSCAN_pos = resultArry[0]
 		self.C_SCANheadMov.append(sum(distArry))
 
-	def LOOK(self):
-		resultArry = list(self.request)
+	def LOOK(self,request,start):
+		resultArry = list(request)
 		distArry = []
 		dist = 0
-		startHead = self.start
+		startHead = start
 		if(self.LOOK_pos != -1):
 			startHead = self.LOOK_pos
 		resultArry.append(startHead)
@@ -193,8 +200,8 @@ class DiskScheduling():
 		startPos = resultArry.index(startHead)
 
 		if(resultArry[startPos] == resultArry[-1]):
-			for x in xrange(len(resultArry),0, -1):
-				dist = abs(resultArry[x] - resultArry[x-1])
+			for x in xrange(len(resultArry)-1,1, -1):
+				dist = abs(resultArry[x-1] - resultArry[x])
 				distArry.append(dist)
 			self.LOOK_pos = resultArry[0]
 		else:
@@ -227,11 +234,11 @@ class DiskScheduling():
 
 		self.LOOKheadMov.append(sum(distArry))
 
-	def C_LOOK(self):
-		resultArry = list(self.request)
+	def C_LOOK(self,request,start):
+		resultArry = list(request)
 		distArry = []
 		dist = 0
-		startHead = self.start
+		startHead = start
 		if(self.CLOOK_pos != -1):
 			startHead = self.CLOOK_pos
 		resultArry.append(startHead)
@@ -286,21 +293,21 @@ if __name__ == "__main__":
 	cscanSTD = []
 	lookSTD = []
 	clookSTD = []
+
 	startHead = int(input("Enter the start head position a value from 0 - 4999: "))
+
 	if(startHead < 4999 and startHead > 0):
+		disk = DiskScheduling()
 		for j in xrange(5):
 			for i in xrange(10):
 				request = getSchedule()
-				disk = DiskScheduling(request, startHead)
-				
-				disk.FCFS()
-				disk.SSTF()
-				disk.SCAN()
-				disk.C_SCAN()
-				disk.LOOK()
-				disk.C_LOOK()
+				disk.FCFS(request, startHead)
+				disk.SSTF(request, startHead)
+				disk.SCAN(request, startHead)
+				disk.C_SCAN(request, startHead)
+				disk.LOOK(request, startHead)
+				disk.C_LOOK(request, startHead)
 
-			print "List ", j
 			print "FCFS: ", (numpy.mean(disk.FCFSheadMov))
 			print "SSTF: ", (numpy.mean(disk.SSTFheadMov))
 			print "Scan: ", (numpy.mean(disk.SCANheadMov))
@@ -315,9 +322,7 @@ if __name__ == "__main__":
 			cscanSTD.append(numpy.mean(disk.C_SCANheadMov))
 			lookSTD.append(numpy.mean(disk.LOOKheadMov))
 			clookSTD.append(numpy.mean(disk.C_LOOKheadMov))
-
 			disk.ClearAll()
-
 
 		print "FCFS Standard Deviation: ", numpy.std(fcfsSTD)
 		print "SSTF Standard Deviation: ", numpy.std(sstfSTD)
