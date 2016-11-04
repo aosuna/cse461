@@ -55,9 +55,8 @@ Assume a first-come, first-served strategy:
 	calculate - time to read all requests, 
 	effective bandwidth (total bytes read)/(time to read requests)
 
-note: read first page = seek+rot_latency+bytes/max_bandwidth
-
-	time to read next page : assume you always have rotational latency, but
+ note: read first page = seek+rot_latency+bytes/max_bandwidth
+	time to read next page| assume you always have rotational latency, but
 	add seek time only if have to change cylinders.
 	  
  * B) Consider multi-page requests : i.e. if a program requests N consecutive pages, rot. 
@@ -94,9 +93,9 @@ Investigation of data structures for disk access
    Of the 3 data structures suggested to store a directory, which is fastest? Is the
    speedup sufficient to justify its use? Explain.
 
-   ** 1) an array of random strings
-   ** 2) a sorted array of random strings (so you can do binary search)
-   ** 3) a hash table of the strings (note - hash table should be at least 1.5 times bigger than your list.
+   :: 1) an array of random strings
+   :: 2) a sorted array of random strings (so you can do binary search)
+   :: 3) a hash table of the strings (note - hash table should be at least 1.5 times bigger than your list.
    
  * 3) Here is a sample function (in C/C++) that returns system time
  
@@ -113,10 +112,10 @@ struct timespec itval;
 	return itval.tv_sec*1000+itval.tv_nsec/1e6;
 }
 ```
-  For details on system call use: man clock_gettime. Although the system clock is theoretically
-  running at gigahertz speeds, you can only read it to microseconds with standard calls. This
-  code divides by 1e6 for seconds, I multiply by 1000 to get miliseconds because measurements close to
-  the limit are less accurate. You will need to repeat the measurent multiple times in a loop, then
-  divide by number of iterations.
+For details on system call use: man clock_gettime. Although the system clock is theoretically
+running at gigahertz speeds, you can only read it to microseconds with standard calls. This
+code divides by 1e6 for seconds, I multiply by 1000 to get miliseconds because measurements close to
+the limit are less accurate. You will need to repeat the measurent multiple times in a loop, then
+divide by number of iterations.
 
 
