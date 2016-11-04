@@ -83,18 +83,19 @@ Investigation of data structures for disk access
  (in C++ I use the function drand48() to give a double precision number between 0 and 1 then 
 	int C,range,base; // must initialize range and base
 	C = drand42() * range + base;
- gives an integer between base and range+base - for example base=97 range=25 returns the
- ASCII codes fro 'a' to 'z' and you can use this to generate characters in a string of 
- whatever length you want. Then do it 10,000 times to generate your list. There are many
- other ways of doing this, depending on your language of choice).
+  gives an integer between base and range+base - for example base=97 range=25 returns the
+  ASCII codes fro 'a' to 'z' and you can use this to generate characters in a string of 
+  whatever length you want. Then do it 10,000 times to generate your list. There are many
+  other ways of doing this, depending on your language of choice).
 
  * 2) Test 3 different data structures for access time
    specifically how long it takes to find a string in the data, or to verify that a string is not there
    Of the 3 data structures suggested to store a directory, which is fastest? Is the
    speedup sufficient to justify its use? Explain.
-    ** 1) an array of random strings
-    ** 2) a sorted array of random strings (so you can do binary search)
-    ** 3) a hash table of the strings (note - hash table should be at least 1.5 times bigger than your list.
+    
+    *:- 1) an array of random strings
+    *:- 2) a sorted array of random strings (so you can do binary search)
+    *:- 3) a hash table of the strings (note - hash table should be at least 1.5 times bigger than your list.
    
  * 3) Here is a sample function (in C/C++) that returns system time
  
