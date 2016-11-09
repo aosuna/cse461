@@ -81,10 +81,10 @@ Investigation of data structures for disk access
 
  * 1) Input data a randomly generated array of 10,000 strings 
  (in C++ I use the function drand48() to give a double precision number between 0 and 1 then 
-  
+  ```
     int C,range,base; // must initialize range and base
     C = drand42() * range + base;
-
+  ```
   gives an integer between base and range+base - for example base=97 range=25 returns the
   ASCII codes fro 'a' to 'z' and you can use this to generate characters in a string of 
   whatever length you want. Then do it 10,000 times to generate your list. There are many
