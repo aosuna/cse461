@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sys/time.h>
 
+//how to compile --> g++ -O3 -o time lab4.cpp
+
 //run sysctl -a | grep cache to see cache size avaiable on MAC OS. 
 using namespace std;
 
