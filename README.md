@@ -101,6 +101,7 @@ Investigation of data structures for disk access
    
  * 3) Here is a sample function (in C/C++) that returns system time
  
+ 
 ```
 #include time.h
 
@@ -120,4 +121,70 @@ code divides by 1e6 for seconds, I multiply by 1000 to get miliseconds because m
 the limit are less accurate. You will need to repeat the measurent multiple times in a loop, then
 divide by number of iterations.
 
+---
 
+##Lab4:
+
+Determination of usable memory bandwidth:
+
+Memory specifications include latency and bandwidth: for example for DDR2 or DDR3 memory,
+the advertised speed (for example: f=1600 GHz) indicates the transfer rate for today's 
+standard 64 bit wide memory bus: in bits/sec this is 64xf = 64 * 1.6e9 ; divide by 8 for
+bytes/second. This is maximum burst rate, under ideal conditions, ignoring startup time
+(latency, a harder to determine value usually somewhere between 10-20 nanoseconds for 
+current chips).
+
+What we want to know is how much you can get in fact. You can do this by measuring the time
+it takes to move some chunk of memory - you can do this using the memmove function
+(see man memmove) or by declaring two arrays and copying from one to the other using a loop.
+Note that the iterations you will need depends on what your array is - an array of double
+has 8 byte items, an array of int has 4 byte items, so double will require fewer iterations
+and probably run faster.
+
+(You may also use memmove in a loop, and copy the array in chunks - I am not sure how much
+memory memmove can handle at one time, it might be smaller than your array). 
+
+You should make sure your arrays are too big to fit in cache, or you will actally be measuring
+cache speed (modern cache is usually 1 or 2 megabytes per CPU core, in Linux you can get the
+cache size by typing "cat /proc/cpuinfo" at the command line). 
+
+You will need to measure time inside the program, sing one of the system timers. A sample
+program (in C, but won't need much change to work in C++) is at :
+
+http://www.cse.csusb.edu/egomez/PC/files/timer.c
+
+What you do is, call the timer and save its value before your memory copy operation, then
+call the timer again afterwards and subtract the start time. This will give you time to copy
+in microseconds (plus whatever overhead you get from the loop or from memmove, which should
+be small enough to ignore).
+
+It may be necessary to put your copy action inside another loop that repeats it some
+specified N times, then you time the outer loop as above and divide by N to get the copy time.
+You may not need this, but depending on array size and computer speed it may give you more
+accuracy.
+
+In any case, repeat your measurement multiple times, give an average and standard deviation.
+
+You will need to program in some compiled laguage - in practice this means C or C++ (or assembler
+or Fortran, or stranger things). If your are using GNU C or C++ (standard in every Linux 
+system) compile with -O3 flag - for example: gcc -O3 memtest.c -o memtest (be sure to add whatever
+other flags you need for math or system calls - see comments in timer.c). This is fairly
+agressive optamization and it makes a difference in reducing your program overhead.
+When you do this, be sure to verify that the copy actually happened; O3 optimization is smart
+enough to tell that you are not using the results of the copy and optimize it out of
+existence.
+
+```
+// Milisecond timer provided by Dr. Ernesto Gomez
+#include time.h
+
+/* compile with -lrt option to gcc */
+
+double milisecond_timer(){
+struct timespec itval;
+/* returns system time in miliseconds */
+
+	clock_gettime(CLOCK_REALTIME,&itval);
+	return itval.tv_sec*1000+itval.tv_nsec/1e6;
+}
+```
