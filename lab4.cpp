@@ -29,7 +29,7 @@ int main(){
 	printf("Y value = %f ms\n", Y);
 
 	printf("Time to execute is %f ms\n", time);
-	printf("bandwidth: %f bytes/s\n", bandwidth);
+	printf("bandwidth: %f bytes/sec\n", bandwidth);
 
 	return 0;
 }
